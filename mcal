@@ -1,0 +1,117 @@
+#	PRACTICA 2 de UNIX:
+
+# Autor: Miguel Omeñaca  
+#!/bin/bash
+
+input1=$1
+input2=$2
+
+# Errores
+E_INVMONTH=1
+E_INVYEAR=2
+E_INVARG=3
+
+# Meses
+mesabrI="jan feb mar apr may jun jul aug sep oct nov dec"
+mesabrE="ene feb mar abr may jun jul ago sep oct nov dic"
+mesesI="january february march april may june july august september october november december"
+mesesE="enero febrero marzo abril mayo junio julio agosto septiembre octubre noviembre diciembre"
+
+
+
+# Help
+help="Este comando muestra un calendario del mes o año especificado, por defecto el mes actual. La sintáxis es: mcal [mes] [año]."
+
+# Función que verifica si la entrada es el mes en letras
+res=0
+cont=0
+checkMonth() {
+	for mes in $mesabrI
+	do 
+	  	let "cont++"
+		if [ "$input1" = "$mes" ]
+		then 
+			res=1
+			return	
+		fi
+	done
+	
+	cont=0
+	for mes in $mesabrE
+        do 
+                let "cont++"
+                if [ "$input1" = "$mes" ]
+                then
+                        res=1
+                        return
+                fi
+        done
+	
+	cont=0
+	for mes in $mesesI
+	do
+		let "cont++"
+		if [ "$input1" = "$mes" ]
+                then
+                	res=1
+			return
+
+                fi 
+	done
+
+	cont=0
+        for mes in $mesesE
+        do           
+		let "cont++"
+                if [ "$input1" = "$mes" ]
+                then   
+                        res=1   
+                        return
+
+                fi      
+        done 	
+	
+}
+
+# Invocamos función
+checkMonth
+
+# Código principal
+case  $# in
+	0) cal;;
+	1) # Un solo argumento, elegimos inteligentemente si es mes,año o help
+	if [ "$input1" = "-help" ] 
+		then 
+			echo $help 
+	elif [ "$res" -eq "1" ]
+		then
+                        cal $cont 2017
+	elif [ "$input1" -le "12" -a "$input1" -gt "0" ] 
+		then 
+			cal $input1 2017
+	elif [ "$input1" -gt "12" ]
+		then 
+			cal $input1
+	 else
+		echo "Mes introducido no válido" >&2; exit &{E_INVMONTH}; 
+	fi;;
+	2) # Dos argumentos, mes y año 
+	if [ "$res" -eq "1" ]
+		then
+			case "$input2" in
+                          [1-9]|[1-9][0-9][0-9][0-9])
+                                                        cal $cont $input2;;
+                        *) echo "Año entre 1-9999" >&2; exit ${E_INVYEAR};;
+                        esac
+	elif [ "$input1" -le "12" -a "$input1" -gt "0" ]
+		then
+			case "$input2" in 
+			  [1-9]|[1-9][0-9][0-9][0-9]) 
+						      cal $input1 $input2;;
+			*) echo "Año entre 1-9999" >&2; exit ${E_INVYEAR};;
+			esac
+	 else 
+		echo "Mes introducido no válido" >&2; exit &{E_INVMONTH};
+         fi;;
+	*) echo "Demasiados argumentos" >&2; exit &{E_INVARG};;
+esac 	 	
